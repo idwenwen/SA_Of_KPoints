@@ -7,8 +7,6 @@
 
 ## 概念与实践
 
-### 变量与类型
-
 #### 类型
 
   - 1. undefined
@@ -120,6 +118,8 @@
 
 
 
+#### 原型链
+
 **问**：instanceof是如何判定某一个对象类型数据是属于哪一个类的呢？
 
 **答**：首先需要理解原型链，个人理解原型链是一系列的细化分类的过程。
@@ -132,7 +132,7 @@
 - 由上面四点我们可以得知，实际上对象最终总是会关联到原始对象的，就像一条链一样环环相扣。这就是原型链。
 - 还有一个我们需要注意的事情就是，由于JS遵循的是事物都是对象，所以Function实际上也是一个对象，不过是一类比较特殊的对象，我们打印Function的prototype属性，实际上就Object.\__proto__的内容，所以我们可以认为Object这个对象构造方法对象实际上是Function创建的。有一种说法，浏览器先创建出初始对象，一句初始对象创建了Function方法对象，再通过Function创建了基础对象的构造器方法Object。所以我们可以绘制下面这样一副关联关系图。
 
-![原型链](F:\前端\review\basic\icon\原型链.png)
+![原型链](..\icon\原型链.png)
 
 上面理解了原型链之后，在需要了解的是instanceof方法的原理了。
 
@@ -140,31 +140,35 @@
 
 instanceof会按照原型链的向下查找，并右右侧运算数据的prototype属性进行比对。如果判定相同，实际上就可以确定左运算内容是否是继承于运算符右侧类型。代码段如下：
 
-***function instance_of (obj, classes) {***
+```js
+function instance_of (obj, classes) {
 
-​	***let origin = classes.prototype***
+	let origin = classes.prototype
 
-​	**let extension = obj.\__proto__**
+	let extension = obj.__proto__
 
-​	***while (extension) {***
+	while (extension) {
 
-​		***if (extension === origin) {***
+		if (extension === origin) {
 
-​			***return true***
+			return true
 
-​		***} else {***
+		} else {
 
-​			**extension = extension.\__proto__**
+			extension = extension.__proto__
 
-​		***}***
+		}
 
-​	***}***
+	}
 
-​	***return false***
+	return false
 
-***}***
+}
+```
 
 
+
+#### 对象描述符
 
 **问**：如何理解对象描述符？
 
@@ -192,15 +196,27 @@ instanceof会按照原型链的向下查找，并右右侧运算数据的prototy
 
 
 
+#### 对象代理
+
 **问**：对象的反射机制的理解。
 
 **答**：反射机制的概念可以如此理解，**运行状态中，可以获取对象之中详细信息（变量，方法）的功能**。js之中可以通过许多的方式获取对象之中的属性与方法，最为直接的便是Object.keys()，遍历当前的对象的可遍历的关键字内容。实际上也算是一种反射机制的体现。同时还有例如hasProperty等判定方法，判定当前对象之中的情况。
 
 ES6之中更为规范的了反射机制的内容，统一归总到Reflect对象之中。MDN之中给出的解释是Reflect对象提供拦截javascript的操作方法，方法与proxy的handler之中的方法相同。
 
+当然可能是为了更为规范并符合逻辑的原因，所以Reflect之中的方法与原来的Object之中的相似方法名称，以及返回值会有一些差别。所以转变使用Reflect的时候一定要注意。
 
 
-### 代码块与作用域
+
+**问**：说说对Proxy的理解
+
+**答**：Proxy对象创建的是一个对象的代理，从而实现基本操作的拦截和自定义。在使用的时候我们需要通过new来创建，所以我们可以理解为，当前的内容实际上是一个新的对象，而这个新的对象所做的事情是，控制待监听对象的相关的操作，并做一些自定义处理。这是JS之中对于代理模式的运用。VUE3 之中耶通过Proxy来进行内容的监听，这样监听可以保证数组类型的数据变化也会被监听到。
+
+Proxy也支持多层代理，这样的话，我们完全可以借用AOP的思想，通过proxy来实现。将安全判定，一定的事务等内容防止在Proxy之中进行确定。配合TS之中的注解进行注入的形式，我们完全可以实现前端的基础AOP。
+
+
+
+#### 代码块与作用域
 
 代码块：两个大括号中间的，都可以理解为代码块，其中可以包含一段完整的逻辑内容。
 
@@ -212,7 +228,7 @@ ES6之中更为规范的了反射机制的内容，统一归总到Reflect对象�
 
 
 
-### 常见语句
+#### 常见语句
 
 - if ...( else if )... else ... : 判断语句，主要用结合布尔运算进行条件判定。
 - switch (exp) ...case... : 同样是作为判定语句的一种，其更多的意味着匹配。exp是一个表达式会获取一个最终结果，case则是具体的结果内容，如果表达式的结果与case相同，则会运行当前case以及之后的对应的代码。
@@ -221,4 +237,76 @@ ES6之中更为规范的了反射机制的内容，统一归总到Reflect对象�
 - for... in 遍历对象之中的每一个可遍历项。获取相关键值。
 - break与continue，break可以直接终止当前循环，默认种植当前层的循环，或者break之后带上loop的别称信息，则可以直接种终止相关的循环内容。continue这是终止当前次循环直接开始下一次的循环。
 - typeof 语句用于判别内容的类型，其最终返回的结果大体只有undefined，number，string，boolean，symbol，object， function。
+
+
+
+#### Promise
+
+什么是Promise？JS中可以理解为一个占位符。代码运行到当前内容时候，有一定的数据内容需要我们异步才能获取，所以我需要给程序一个预定义的占位符，说明会给逻辑一个承诺，异步获取到数据之后会给与占位符。这样我们就可以将原本异步的形式与回调，语义化成为同步的形式。通过占位符代替当前没有获取但是需要的数据。
+
+上述是对Promise的理解，也有同学将promise理解为一个承诺对象，承诺一个将来会给定的数值。也是相同的。
+
+promise是如何使用的呢。看一段代码
+
+```js
+new.promise(function(resolve, reject) {
+
+	if (err) reject(err)
+
+	resolve(res)
+
+})
+```
+
+这里我们可以看到，Promise对象之中传递的是一个方法，同时方法之中有resolve以及reject两个方法，这两个方法，一个是在完成的时候调用的，一个是在出现错误的时候调用的来拒绝当前的承诺。
+
+由上面可知，promise实际上是会有**三种状态**的。
+
+1. **pending**: 初始化状态，也就是我们常说的待定状态。
+2. **fulfilled**: 表示承诺已经对象，也就是当调用了resolve方法之后设置的状态。
+3. **rejected**：表示承诺已经拒绝了，意味着当前的操作失败了，也就是调用rejected之后的状态。
+
+
+
+上面是生成了一个promise对象，那么Promise是如何将代码同步化的呢。
+
+promise对象可以，调用如下方式，获取相关的信息，并进行promise之后的步骤。
+
+1. **then** ( function resolve, function reject ): then方法表示承诺兑现之后，获取需要的信息，然后需要进行的后续步骤。function resolve表示的是resolve的后续操作，function reject表示的是调用reject的后续操作。可以获取promise对象之中reject方法传递的数据。并最后将返回数值作为Promise进行下一步操作。
+2. **catch** ( function reject )：抓取当前reject抛出的错误信息。并返回一个结果给到promise链中的下一环。
+3. **finally**（function final）：final方法获取的返回时resolve或者reject
+
+
+
+由于我们可以看到调用方法实际上是返回一个新的promise，所以Promise之后的内容实际上是一个链式调用的形式，也符合它将异步转化称为同步的理念。
+
+当然具体看调用形式，实际上promise本身还是以一种回调的形式来调用之后的内容，那么**为什么说它是符合安全异步的形式的呢**？这是因为，以往的异步形式，需要我们的传递回调方法，这样的话实际上回调方法的具体调用时间和次数都是由调用方说了算，这样的话实际上是及其不安全的，因为调用方有任何的修改，都会影响到回调函数触发。而使用promise的话就不会出现这个问题，回调函数的调用事件和机制掌握在触发方，而调用方只需要返回带有具体数值的promise就可以了，这样通过promise来达成一个双方可信赖的基础。
+
+**为什么说promise可以解决回调地狱？**什么是回调地狱。启始我们程序之中往往回调的内容将不会是一层，可能由于一处是异步的情况，所以相关的逻辑需要多层回调，所以这个时候由于回调产生的逻辑变动以及耦合就很容易产生，这样便使得代码十分的凌乱，不易维护，从而会有回调地狱的问题出现。而promise则可以为我们处理回调地狱提供一种发放时。通过promise的形式，我们可以发现需要通过回调的逻辑可以放在原调用方之中通过then方法来自主的调用，这样回调之间的耦合可以解开，同时也提高了代码逻辑的内聚性。
+
+promise对象也不仅仅只有上面的方法，同时也提供了许多其他的内容，例如我们在处理多个promise执行，并且需要在多个都执行完成的情况下才能执行后面的内容，单凭上面的方式是没有办法处理的，所以Promise也为我们提供了许多的静态方法。
+
+1. Promise.all( arr[Promise] )：传递的是promise数组，当数组之中的所有promise都运行完成了之后才会调用之后的内容，并且外层promise的状态将会依据内层所有的promise的状态来确定，只有当内部所有的promise的都完成了才会外城promise才会变成fullfill状态。
+2. Promise.race( arr[Promise] )：传递的是promise数组内容，但是与all不相同的是，当前方法传递的promise之中只要有一个pomise状态改变了话，外城promise就会有所改变。
+3. Promise.allSettled( arr[Promise] )：当所有的内容都已经完成了，则外城promise会自动设置称为fullfill，不论子promise完成时候的状态。
+4. Promise.any( any[Promise] )：表示的是只要传递的promise数组之中的任何一个promise状态转变成为fullfill则promise的状态是为fullfill。（逻辑类似于或）
+5. Promise.resolve()：直接生成一个状态是fullfill的promise内容并返回。
+6. Promise.reject()：直接生成一个状态是reject的promise内容并返回。
+7. Promise.try()：有的时候需要使用promise但是不确定当前的方法是否需要同步的情况下，我们可以使用try方法，如果方法是同步的，则同步运行，如果方法是异步的，则异步运行，类似于async的效果。
+
+
+
+我们应该如何**通过ployfill的形式添加对于promise的支持呢**？（TODO）
+
+
+
+#### 生成器
+
+generator也是JS提供的一种异步编程。它称作生成器方法。其关键字主要是*与yield。调用函数之后获取的是一个可遍历对象，其中的数据顺序是yield输出的数据顺序。那为什么说是一种异步编程的方法呢？因为在yield关键字处，当前程序将会自动pending。然后运行其他的程序内容，只有当我们调用next方法的时候，才会继续之前的地方执行。当然生成器函数也可以配合 for...of循环使用，这样会自动调用next方法来来获取生成器之中的数据。
+
+当然js之中也有提供针对生成器方法的语法糖，async与await，async函数实际上是一个会自动调用的生成器函数，无需我们调用next函数了，同时其可以配合promise使用，因为awiat可以帮助我们拆解promise内容获取数据，同时返回的数据也会自动的组装成为一个promise。
+
+
+
+
 
