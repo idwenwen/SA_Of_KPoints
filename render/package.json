@@ -1,0 +1,22 @@
+{
+  "name": "cr_render",
+  "version": "1.0.0",
+  "description": "canvas render component",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "js",
+    "canvas",
+    "2d"
+  ],
+  "author": "Arvin Huang",
+  "license": "ISC",
+  "devDependencies": {
+    "awesome-typescript-loader": "^5.2.1",
+    "source-map-loader": "^2.0.1",
+    "typescript": "^4.2.2",
+    "webpack": "^5.24.1"
+  }
+}
