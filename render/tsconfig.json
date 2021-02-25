@@ -5,6 +5,7 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "allowJs": true,
+    "target": "ESNext"
   },
   "include": [
     "src/**/*"
