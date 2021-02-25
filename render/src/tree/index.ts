@@ -1,8 +1,9 @@
+import deepIteration from "./deepIterator";
 import TreeNode from "./treeNode";
 import { nodeSetting } from "./type";
 
 // 树结构管理，包括维护一系列的数据指向，以及依据配置创建新的树内容。依据diff改变存储信息等等。
-class TreeManager<T extends TreeNode> {
+export default class TreeManager<T extends TreeNode> {
   private tree: T | TreeNode; // 当前树状图的信息节点与节点间关系。
   private nodes: Map<string, T | TreeNode>; // 方便快速查找节点
   private treeType: { new (setting?: nodeSetting): T | TreeNode }; // 当前树几点的构造函数。
@@ -48,5 +49,17 @@ class TreeManager<T extends TreeNode> {
    */
   getNode(uuid: string) {
     return this.nodes.get(uuid);
+  }
+
+  private *iterator(
+    deep: boolean,
+    reserve: boolean = false,
+    tree: T | TreeNode = this.tree
+  ) {
+    if (deep) {
+      yield* deepIteration(tree, reserve);
+    } else {
+      yield* h;
+    }
   }
 }

@@ -1,14 +1,8 @@
 import record from "../exception/index";
-import Tree from "./index";
+import TreeNode from "./treeNode";
 
-function getTreesByLevel(tree: Tree, level: number) {
-  const rootLevel = tree.level;
-  const between = level - rootLevel;
-
-  if (between < rootLevel)
-    throw record("oversize", "Level need to be bigger than tree node is given");
-
-  const res: Array<Tree> = [];
+function toHierarchy<T extends TreeNode>(tree: T | TreeNode) {
+  const levels: Array<T | TreeNode> = [];
 }
 
-function* horizenIterator() {}
+export default function* horizenIterator() {}
