@@ -1,6 +1,11 @@
-import deepIteration from "./deepIterator";
+import deepIterator from "./deepIterator";
+import horizenIterator from "./horizonIterator";
 import TreeNode from "./treeNode";
-import { nodeSetting } from "./type";
+
+export type nodeSetting = {
+  uuid?: string;
+  children?: [];
+};
 
 // 树结构管理，包括维护一系列的数据指向，以及依据配置创建新的树内容。依据diff改变存储信息等等。
 export default class TreeManager<T extends TreeNode> {
@@ -47,19 +52,50 @@ export default class TreeManager<T extends TreeNode> {
    * 获取指定的node对象。
    * @param uuid 唯一标识符
    */
-  getNode(uuid: string) {
+  public getNode(uuid: string): T | TreeNode {
     return this.nodes.get(uuid);
   }
 
+  /**
+   * 返回可遍历对象，用于不同方式遍历树
+   * @param deep 是否进行深度遍历
+   * @param reverse 是否反向遍历
+   * @param tree 遍历开始的节点
+   */
   private *iterator(
     deep: boolean,
-    reserve: boolean = false,
+    reverse: boolean = false,
     tree: T | TreeNode = this.tree
   ) {
     if (deep) {
-      yield* deepIteration(tree, reserve);
+      yield* deepIterator(tree, reverse);
     } else {
-      yield* h;
+      yield* horizenIterator(tree, reverse);
     }
+  }
+
+  /**
+   * 遍历树内容
+   */
+  public each(
+    operation: Function,
+    deep: boolean = true,
+    reverse: boolean = false
+  ): void {
+    for (const val of this.iterator(deep, reverse, this.tree)) {
+      operation(val);
+    }
+  }
+  public eachByDeep(operation: Function): void {
+    this.each(operation);
+  }
+  public eachByDeepFromRev(operation: Function): void {
+    this.each(operation, true, false);
+  }
+  public eachByHor(operation: Function): void {
+    this.each(operation, false);
+  }
+  public eachByHorFromRev(operation: Function): void {
+    this.each(operation, false, false);
   }
 }

@@ -1,19 +1,19 @@
 import TreeNode from "./treeNode";
 
 // 深度遍历算法
-export default function* deepIteration<T extends TreeNode>(
+export default function* deepIterator<T extends TreeNode>(
   tree: T,
-  reserve: boolean = false
+  reverse: boolean = false
 ) {
-  if (!reserve) {
+  if (!reverse) {
     yield tree;
   }
   if (tree.children.length > 0) {
     for (const val of tree.children) {
-      yield* deepIteration(val, reserve);
+      yield* deepIterator(val, reverse);
     }
   }
-  if (reserve) {
+  if (reverse) {
     yield tree;
   }
 }
