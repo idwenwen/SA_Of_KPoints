@@ -4,6 +4,7 @@ import BreakException from "./breakException";
 import EqualException from "./equalException";
 import ExistException from "./existException";
 import OversizeException from "./oversizeException";
+import NotExistException from "./notExistException";
 
 /**
  * 获取对应的异常实例。
@@ -20,6 +21,8 @@ function exceptionFactory(alias: string, message: string): Exception {
       return new EqualException(message);
     case "oversize":
       return new OversizeException(message);
+    case "notExist":
+      return new NotExistException(message);
     default:
       return new Exception(typeGrade.Info, message);
   }
