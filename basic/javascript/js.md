@@ -87,8 +87,10 @@ ECMAScript 第一个标准版本是在 1997 年诞生的。
 
     - 上面两个方法都是在全局范围内设定的标识符内容，但是通过 Symbol 创建的内容是不会放在 Symbol 的全局作用域之中的。
 
-    - JS 之中实际上已经有一些内容通过 Symbol 表示了，并设置到了我们的基础内容之中，例如遍历，match 等方法。我们可以在创建对象的时候通过特性的标识符来重写当前对象的特定方法。
+    - 通过Symbol创建的标识使用在object之中的话，属性将不可以遍历哟。
 
+    - JS 之中实际上已经有一些内容通过 Symbol 表示了，并设置到了我们的基础内容之中，例如遍历，match 等方法。我们可以在创建对象的时候通过特性的标识符来重写当前对象的特定方法。
+    
       > P.S. 内置方法之中，实际上 ES5 之前就设置了一些没有暴露给开发者的 Symbol，此条特性就是覆盖原有方法，提供了新的逻辑。
 
 #### 变量：
@@ -150,6 +152,39 @@ function instance_of(obj, classes) {
   return false;
 }
 ```
+
+#### JS之中的继承方式
+
+五种经典的继承方式
+
+1. prototype的修改。在已有的prototype之中添加或者覆盖已有的方法。
+2. prototype的直接修改，但是这个时候最好添加上constructor来指向原有的构造方法哟。
+3. mixin的方式将一个已有内容混入到新的对象内容。浅拷贝的形式，新的对象之中有一个指针指向已有的对象之中的对象以及方法。
+4. 寄生继承，通过调用另一个构造函数来，继承另一个对象的内容。
+5. 实例继承，子类构造方法之中直接调用父类构造方法，产生新的父类实例，最后使用父类实例进行拓展。
+6. 组合继承，父类构造之中值给定必要的属性，方法则存储在父类的prototype属性之中，这样我们可以使用组合继承，字类构造函数之中调用父类构造函数，字类构造器的prototype直接赋值为父类对象。
+7. class的extends方式，实际上可以理解为组合继承的方式来实现继承内容。
+
+#### 如何理解new
+
+1. 通过Object.create(constructor.prototype)创建对象。
+2. 通过新的对象调用apply方法并传入参数。
+
+#### JSON类型的理解
+
+​	实际上我们常常使用JSON对象，一个JSON字符串可以直接转换成为对象，而一个对象也可以字面化成为JSON字符串。
+
+​	但是在转化的过程中有一些内容是不会带入到JSON之中的例如方法，undefined等内容。所以一个对象在转化成为JSON字符串的时候是不会将这些内容转换过来的。如果是属性是undefined或者方法则不会记录到JSON字符串之中，如果是某一个数组属性之中函数有这些内容，则会转换成为null写入JSON之中，如果属性是Symbol的话也不会记录到JSON之中。
+
+​	如何加载.JSON内容到JS之中呢，通过AJAX（XMLHttpRequest）的形式将JSON内容作为资源加载进入到JS之中。
+
+​	转换方法：
+
+​		JSON.stringify() ：对象转换成为字符串。
+
+​		JSON.parse(): 字符串转化成为对象
+
+​	
 
 #### 对象描述符
 
@@ -254,7 +289,7 @@ promise 对象可以，调用如下方式，获取相关的信息，并进行 pr
 promise 对象也不仅仅只有上面的方法，同时也提供了许多其他的内容，例如我们在处理多个 promise 执行，并且需要在多个都执行完成的情况下才能执行后面的内容，单凭上面的方式是没有办法处理的，所以 Promise 也为我们提供了许多的静态方法。
 
 1. Promise.all( arr[Promise] )：传递的是 promise 数组，当数组之中的所有 promise 都运行完成了之后才会调用之后的内容，并且外层 promise 的状态将会依据内层所有的 promise 的状态来确定，只有当内部所有的 promise 的都完成了才会外城 promise 才会变成 fullfill 状态。
-2. Promise.race( arr[Promise] )：传递的是 promise 数组内容，但是与 all 不相同的是，当前方法传递的 promise 之中只要有一个 pomise 状态改变了话，外城 promise 就会有所改变。
+2. Promise.race( arr[Promise] )：传递的是 promise 数组内容，但是与 all 不相同的是，当前方法传递的 promise 之中只要有一个 pomise 状态改变了话，外层 promise 就会有所改变。
 3. Promise.allSettled( arr[Promise] )：当所有的内容都已经完成了，则外城 promise 会自动设置称为 fullfill，不论子 promise 完成时候的状态。
 4. Promise.any( any[Promise] )：表示的是只要传递的 promise 数组之中的任何一个 promise 状态转变成为 fullfill 则 promise 的状态是为 fullfill。（逻辑类似于或）
 5. Promise.resolve()：直接生成一个状态是 fullfill 的 promise 内容并返回。
@@ -267,4 +302,95 @@ promise 对象也不仅仅只有上面的方法，同时也提供了许多其他
 
 generator 也是 JS 提供的一种异步编程。它称作生成器方法。其关键字主要是\*与 yield。调用函数之后获取的是一个可遍历对象，其中的数据顺序是 yield 输出的数据顺序。那为什么说是一种异步编程的方法呢？因为在 yield 关键字处，当前程序将会自动 pending。然后运行其他的程序内容，只有当我们调用 next 方法的时候，才会继续之前的地方执行。当然生成器函数也可以配合 for...of 循环使用，这样会自动调用 next 方法来来获取生成器之中的数据。
 
-当然 js 之中也有提供针对生成器方法的语法糖，async 与 await，async 函数实际上是一个会自动调用的生成器函数，无需我们调用 next 函数了，同时其可以配合 promise 使用，因为 awiat 可以帮助我们拆解 promise 内容获取数据，同时返回的数据也会自动的组装成为一个 promise。
+当然 js 之中也有提供针对生成器方法的语法糖，async 与 await，async 函数实际上是一个会自动调用的生成器函数，无需我们调用 next 函数了，同时其可以配合 promise 使用，因为 awiat 可以帮助我们拆解 promise 内容获取数据，同时返回的数据也会自动的组装成为一个 promise。generator的原生书写。
+
+
+
+## 内部类
+
+#### Array拓展
+
+- Array.from(arr): 类似数组对象和可遍历对象转换成为数组对象。
+
+- Array.of(...param): 将一组值转换成为数组。
+
+  ```js
+  // Array.of()的polyfill
+  function arrayOf() {
+  	return [].slice.call(arguments)
+  }
+  ```
+
+- 数组遍历：
+
+  - entires：返回可遍历对象，[index, value] 结合for...of使用
+  - every：判定所有的数据项都符合条件，传递一个方法，由于需要判定所有的内容，所以会逐一遍历。
+  - find：因为需要查找数据之中是否有符合要求的一项，所以需要遍历，但是查到第一个时候就会终止。
+  - findIndex：类似于find，但是返回的是第一个值的索引。
+  - forEach：每个元素指定一次执行的方法。返回值是undefined
+  - keys: 类似entires，但是只是返回索引的可遍历函数。
+  - map：每个值调用一个方法，但是返回一个心得额数组，数组值是遍历时候方法调用的返回值。
+  - reduce：遍历每一项，但是传递的方法有两个必要参数，accumlator和currentValue，主要用于累加。
+  - reduceRight：同reduce，但是遍历的方向相反。
+  - some：当前数组之中至少有一项符合当前的条件。
+  - values: 类似entires返回的是纯数值的可遍历对象。
+  - filter: 筛选所有的数组项，返回符合要求的向项
+
+- 其他常用方法
+
+  - concat: 合并多个数组参数，浅拷贝每一个数组内容，按照顺序合并到一个新的数组之中。
+  - copyWithIn：复制当前数组的一段到指定的位置，并替换指定位置的内容。并返回这个数组，修改原数组的哟。
+  - slice：截取一段数组之中的内容，返回当前片段的浅拷贝。
+  - splice：删除或者替换原有数据内容。
+  - indexOf：找到符合条件的第一项的下标。
+  - lastIndexOf：找到符合条件的最后一项的下标。
+  - sort：排序方法，默认依据utf-16的字符顺序进行排序的。
+
+> p.s 什么是UTF-16? 
+>
+> unicode：4个字节标识所有文字符号的编码。
+>
+> utf-8: 1到4字节编码字符，长度可变，减少存储量。
+>
+> utf-16：2到4个字节的变化存储。
+>
+> utf-32:  固定4字节的编码存储。
+
+>p.s. 既然讲到数组，那么这里需要提一下伪数组？
+>
+>什么是伪数组，就是拥有部分数组特性（length， 下标，部分类似于数组的方法），但是并不是正统意义上的数组对象的对象。
+>
+>具体的伪数组有，1. arguments。2. document部分api返回的NodeList也是一个伪数组对象。3.自定义的某一些对象。
+>
+>什么方式可以将伪数组转化成为数组呢？ 1. [].slice.call(ArrayLike)。2. Array.from()可以直接转化。
+
+#### TypedArray
+
+简介：类型化数组。对象描述了一个底层的二进制缓存区的一个类数组视图。typedArray实际上并不是一个类或者一个构造函数，而是许多种类型，类型如下：
+
+1. Int8Array：
+2. Unit8Array：
+3. Unit8ClampedArray:
+4. Int16Array:
+5. Unit16Array:
+6. Int32Array:
+7. Unit32Array:
+8. Float32Array:
+9. Float64Array:
+
+同时其拥有如下属性：
+
+	1. byte：表示的是TypeArray可访构造期间引用的ArrayBuffer
+ 	2. byteLength：表示类型化数组的长度。
+ 	3. byteOffset：表示起始偏移位置。构造期间已经确定了。
+ 	4. name：属性表示当前类型数组的构造函数名称。
+ 	5. 方法其实很多类似于Array的形式。具体可见MDN
+
+#### ArrayBuffer
+
+通用的固定长度的原始二进制数据缓冲区。他是一个字节数组。并不能直接操作需要配合我们上面所述的类型数组。
+
+#### DataView
+
+DataView是可以从二进制ArrayBuffer之中读取多种数值的底层接口
+
